@@ -42,7 +42,7 @@ You can install the latest release from `PyPI <https://pypi.org/project/multifor
 
 .. code-block:: console
 
-    $ pip install --upgrade multiformats
+    $ pip install --upgrade multiformats_fix
 
 The following are mandatory dependencies for this module:
 
@@ -63,7 +63,7 @@ You can install the latest release together with all optional dependencies as fo
 
 .. code-block:: console
 
-    $ pip install --upgrade multiformats[full]
+    $ pip install --upgrade multiformats_fix[full]
 
 
 Usage
@@ -71,7 +71,7 @@ Usage
 
 You can import multiformat protocols directly from top level:
 
->>> from multiformats import *
+>>> from multiformats_fix import *
 
 The above will import the following names:
 
