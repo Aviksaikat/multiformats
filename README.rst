@@ -71,7 +71,7 @@ Usage
 
 You can import multiformat protocols directly from top level:
 
->>> from multiformats_fix import *
+>>> from multiformats import *
 
 The above will import the following names:
 
