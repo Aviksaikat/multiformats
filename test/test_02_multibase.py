@@ -7,75 +7,85 @@
 from random import Random
 
 import multiformats_config
+
 from multiformats import multibase
 from multiformats.multibase import Multibase
 
 
 def test_exists() -> None:
-    """ Tests `multibase.exists`. """
+    """Tests `multibase.exists`."""
     assert multibase.exists("identity")
     assert multibase.exists(code="\x00")
 
+
 def test_get() -> None:
-    """ Tests `multibase.get`. """
+    """Tests `multibase.get`."""
     enc = multibase.get("base16")
     assert enc.name == "base16"
     assert enc.code == "f"
     assert enc.status == "default"
     assert enc.description == "hexadecimal"
 
+
 def test_multibase_contructor() -> None:
-    """ Tests `Multibase.from_json`. """
+    """Tests `Multibase.from_json`."""
     m_json = {
         "name": "my-codec",
         "code": "W",
         "status": "draft",
-        "description": "my private codec"
+        "description": "my private codec",
     }
     enc = Multibase(**m_json)
     assert enc.name == m_json["name"]
     assert enc.code == "W"
     assert enc.status == m_json["status"]
     assert enc.description == m_json["description"]
-    assert str(enc) == f"Multibase({', '.join(f'{k}={repr(v)}' for k, v in m_json.items())})"
+    assert (
+        str(enc)
+        == f"Multibase({', '.join(f'{k}={repr(v)}' for k, v in m_json.items())})"
+    )
     m_json = {
         "name": "my-codec",
         "code": "0x02",
         "status": "draft",
-        "description": "my private codec"
+        "description": "my private codec",
     }
     enc = Multibase(**m_json)
     assert enc.name == m_json["name"]
     assert enc.code == "\x02"
     assert enc.status == m_json["status"]
     assert enc.description == m_json["description"]
-    assert str(enc) == f"Multibase({', '.join(f'{k}={repr(v)}' for k, v in m_json.items())})"
+    assert (
+        str(enc)
+        == f"Multibase({', '.join(f'{k}={repr(v)}' for k, v in m_json.items())})"
+    )
 
 
 def test_multibase_to_json() -> None:
-    """ Tests `Multibase.to_json`. """
+    """Tests `Multibase.to_json`."""
     m_json = {
         "name": "my-codec",
         "code": "W",
         "status": "draft",
-        "description": "my private codec"
+        "description": "my private codec",
     }
     assert Multibase(**m_json).to_json() == m_json
     m_json = {
         "name": "my-codec",
         "code": "0x02",
         "status": "draft",
-        "description": "my private codec"
+        "description": "my private codec",
     }
     assert Multibase(**m_json).to_json() == m_json
 
+
 def test_register() -> None:
-    """ Tests `multibase.register`. """
+    """Tests `multibase.register`."""
     m_json = {
         "name": "my-codec",
         "code": "W",
         "status": "draft",
-        "description": "my private codec"
+        "description": "my private codec",
     }
     enc = Multibase(**m_json)
     assert not multibase.exists(enc.name)
@@ -85,13 +95,14 @@ def test_register() -> None:
     assert multibase.exists(code=enc.code)
     assert multibase.get(enc.name) == multibase.get(code=enc.code) == enc
 
+
 def test_unregister() -> None:
-    """ Tests `multibase.get`. """
+    """Tests `multibase.get`."""
     m_json = {
         "name": "my-codec",
         "code": "W",
         "status": "draft",
-        "description": "my private codec"
+        "description": "my private codec",
     }
     enc = Multibase(**m_json)
     assert multibase.exists(enc.name)
@@ -100,7 +111,7 @@ def test_unregister() -> None:
         "name": "my-codec-2",
         "code": "0x02",
         "status": "draft",
-        "description": "my second private codec"
+        "description": "my second private codec",
     }
     m2 = Multibase(**m2_json)
     assert not multibase.exists(m2.name)
@@ -113,8 +124,9 @@ def test_unregister() -> None:
     assert not multibase.exists(m2.name)
     assert not multibase.exists(code=m2.code)
 
+
 def test_table() -> None:
-    """ Tests `multibase.table`. """
+    """Tests `multibase.table`."""
     try:
         enc = next(multibase.table())
         assert enc.name == "identity" and enc.code_printable == "0x00"
@@ -139,8 +151,9 @@ def test_table() -> None:
     except ValueError:
         pass
 
+
 def test_api_failure_modes() -> None:
-    """ Tests failure modes for the multicode API. """
+    """Tests failure modes for the multicode API."""
     # pylint: disable = too-many-statements
     try:
         Multibase(name="3my-codec", code="0x00")
@@ -164,17 +177,23 @@ def test_api_failure_modes() -> None:
         pass
     try:
         Multibase(name="3my-codec", code="\x00")
-        assert False, "Codes in single-character format must be printable ASCII characters."
+        assert (
+            False
+        ), "Codes in single-character format must be printable ASCII characters."
     except ValueError:
         pass
     try:
         Multibase(name="3my-codec", code="\x80")
-        assert False, "Codes in single-character format must be printable ASCII characters."
+        assert (
+            False
+        ), "Codes in single-character format must be printable ASCII characters."
     except ValueError:
         pass
     try:
         Multibase(name="3my-codec", code="\x7F")
-        assert False, "Codes in single-character format must be printable ASCII characters."
+        assert (
+            False
+        ), "Codes in single-character format must be printable ASCII characters."
     except ValueError:
         pass
     try:
@@ -183,7 +202,7 @@ def test_api_failure_modes() -> None:
     except KeyError:
         pass
     try:
-        multibase.get(code='\x08')
+        multibase.get(code="\x08")
         assert False, "Multibase with code 'W' should not exist."
     except KeyError:
         pass
@@ -199,6 +218,7 @@ def test_api_failure_modes() -> None:
         assert False, "Codec with code 0x00 already exists."
     except ValueError:
         pass
+
 
 rand = Random(0)
 nsamples = 1024
@@ -221,10 +241,11 @@ for b, s in list(_proquints.items()):
     _proquints[b[:2]] = s[:5]
     _proquints[b[2:]] = s[6:]
 
+
 def test_proquint() -> None:
     proquint = multibase.get("proquint")
     for b, s in _proquints.items():
-        s = 'pro-'+s
+        s = "pro-" + s
         error_msg = f"Proquint encode error at b = {list(b)}, s = {repr(s)}"
         assert proquint.encode(b) == s
         error_msg = f"Proquint decode error at b = {list(b)}, s = {repr(s)}"

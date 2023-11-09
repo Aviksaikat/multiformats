@@ -11,25 +11,24 @@ if __name__ != "__main__":
 import argparse
 import gc
 import sys
-from typing import Any, Callable, Collection, Dict, List, Optional, Tuple, Union
+from typing import (Any, Callable, Collection, Dict, List, Optional, Tuple,
+                    Union)
 
+# `psutil` is not a dependency for the `multiformats` library
+import psutil  # type: ignore
+# `pympler` is not a dependency for the `multiformats` library
+from pympler import tracker  # type: ignore
 # `rich` is not a dependency for the `multiformats` library
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-
 # `setuptools_scm` is a development dependency for the `multiformats` library
-from setuptools_scm import get_version # type: ignore
+from setuptools_scm import get_version  # type: ignore
 
-# `psutil` is not a dependency for the `multiformats` library
-import psutil # type: ignore
-
-# `pympler` is not a dependency for the `multiformats` library
-from pympler import tracker # type: ignore
 
 def bytesize_str(nbytes: int) -> str:
     """
-        Pretty string representation of bytesizes.
+    Pretty string representation of bytesizes.
     """
     sign = ""
     if nbytes < 0:
@@ -42,9 +41,10 @@ def bytesize_str(nbytes: int) -> str:
         suffix_idx += 1
     return f"{sign}{nbytes}{suffixes[suffix_idx]}"
 
+
 def print_diff(diff: list[tuple[str, int, int]], console: Console) -> None:
     """
-        Prints a tracker diff object to console
+    Prints a tracker diff object to console
     """
     table = Table()
     table.add_column("Type", style="bold green")
@@ -54,22 +54,27 @@ def print_diff(diff: list[tuple[str, int, int]], console: Console) -> None:
         table.add_row(t, str(c), bytesize_str(s))
     console.print(table)
 
+
 # == Extract commandline args ==
 
 description = "Implementation report for multiformats."
 parser = argparse.ArgumentParser(description=description)
-parser.add_argument("-m", help='loads a minimal set of multicodecs and multibases', action="store_true")
-parser.add_argument("-d", help='print codes as decimal rather than hex', action="store_true")
-parser.add_argument("-r", help='saves report to file', action="store_true")
+parser.add_argument(
+    "-m", help="loads a minimal set of multicodecs and multibases", action="store_true"
+)
+parser.add_argument(
+    "-d", help="print codes as decimal rather than hex", action="store_true"
+)
+parser.add_argument("-r", help="saves report to file", action="store_true")
 args = parser.parse_args()
 minimal_load = args.m
 hex_codes = not args.d
 save_report = args.r
-code2str: Callable[[int], str] = hex if hex_codes else str # type: ignore
+code2str: Callable[[int], str] = hex if hex_codes else str  # type: ignore
 
 # == Intro panel with version ==
 
-version = get_version(root='.', version_scheme="post-release")
+version = get_version(root=".", version_scheme="post-release")
 
 console = Console(record=True, width=110)
 console.print(Panel(f"Multiformats implementation report [bold blue]v{version}[white]"))
@@ -89,39 +94,42 @@ psutil_prev = baseline
 tr = tracker.SummaryTracker()
 tr.diff()
 import typing_extensions
+
 gc.collect()
 tracker_diff = tr.diff()
 pympler_count["typing-extensions"] = sum(entry[1] for entry in tracker_diff)
 pypler_diff = sum(entry[2] for entry in tracker_diff)
 pympler_mem_usage["typing-extensions"] = pypler_diff / (1024 * 1024)
 pympler_prev += pypler_diff
-psutil_diff = psutil.Process().memory_full_info().uss / (1024 * 1024)-psutil_prev
+psutil_diff = psutil.Process().memory_full_info().uss / (1024 * 1024) - psutil_prev
 psutil_mem_usage["typing-extensions"] = psutil_diff
 psutil_prev += psutil_diff
 
 tr = tracker.SummaryTracker()
 tr.diff()
 import typing_validation
+
 gc.collect()
 tracker_diff = tr.diff()
 pympler_count["typing-validation"] = sum(entry[1] for entry in tracker_diff)
 pypler_diff = sum(entry[2] for entry in tracker_diff)
 pympler_mem_usage["typing-validation"] = pypler_diff / (1024 * 1024)
 pympler_prev += pypler_diff
-psutil_diff = psutil.Process().memory_full_info().uss / (1024 * 1024)-psutil_prev
+psutil_diff = psutil.Process().memory_full_info().uss / (1024 * 1024) - psutil_prev
 psutil_mem_usage["typing-validation"] = psutil_diff
 psutil_prev += psutil_diff
 
 tr = tracker.SummaryTracker()
 tr.diff()
 import bases
+
 gc.collect()
 tracker_diff = tr.diff()
 pympler_count["bases"] = sum(entry[1] for entry in tracker_diff)
 pypler_diff = sum(entry[2] for entry in tracker_diff)
 pympler_mem_usage["bases"] = pypler_diff / (1024 * 1024)
 pympler_prev += pypler_diff
-psutil_diff = psutil.Process().memory_full_info().uss / (1024 * 1024)-psutil_prev
+psutil_diff = psutil.Process().memory_full_info().uss / (1024 * 1024) - psutil_prev
 psutil_mem_usage["bases"] = psutil_diff
 psutil_prev += psutil_diff
 
@@ -129,23 +137,29 @@ tr = tracker.SummaryTracker()
 tr.diff()
 if minimal_load:
     import multiformats_config
+
     multiformats_config.enable(codecs=[], bases=[])
 import multiformats
 from multiformats import *
+
 gc.collect()
 tracker_diff = tr.diff()
 pympler_count["multiformats"] = sum(entry[1] for entry in tracker_diff)
 pypler_diff = sum(entry[2] for entry in tracker_diff)
 pympler_mem_usage["multiformats"] = pypler_diff / (1024 * 1024)
 pympler_prev += pypler_diff
-psutil_diff = psutil.Process().memory_full_info().uss / (1024 * 1024)-psutil_prev
+psutil_diff = psutil.Process().memory_full_info().uss / (1024 * 1024) - psutil_prev
 psutil_mem_usage["multiformats"] = psutil_diff
 psutil_prev += psutil_diff
 
 pympler_mem_usage_total = sum(pympler_mem_usage.values())
-pympler_mem_usage_pct = {k: v/pympler_mem_usage_total for k, v in pympler_mem_usage.items()}
+pympler_mem_usage_pct = {
+    k: v / pympler_mem_usage_total for k, v in pympler_mem_usage.items()
+}
 psutil_mem_usage_total = sum(psutil_mem_usage.values())
-psutil_mem_usage_pct = {k: v/psutil_mem_usage_total for k, v in psutil_mem_usage.items()}
+psutil_mem_usage_pct = {
+    k: v / psutil_mem_usage_total for k, v in psutil_mem_usage.items()
+}
 
 # == Memory usage table ==
 
@@ -158,12 +172,14 @@ table.add_column("Memory", style="bold blue", justify="right")
 table.add_column("Memory %", style="bold blue", justify="right")
 for k, v in pympler_mem_usage.items():
     pct = f"{pympler_mem_usage_pct[k]:.0%}" if k in pympler_mem_usage_pct else ""
-    if v >= 1000/1024:
+    if v >= 1000 / 1024:
         table.add_row(k, str(pympler_count[k]), f"{v:.1f}MiB", pct)
     else:
         table.add_row(k, str(pympler_count[k]), f"{1024*v:.0f}KiB", pct)
 console.print(f"> memory baseline: [bold blue]{baseline:.1f}MiB[white]")
-console.print(f"> multiformats memory total:     [bold blue]{pympler_mem_usage_total:.1f}MiB[white]")
+console.print(
+    f"> multiformats memory total:     [bold blue]{pympler_mem_usage_total:.1f}MiB[white]"
+)
 console.print(table)
 
 
@@ -175,12 +191,14 @@ table.add_column("Memory", style="bold blue", justify="right")
 table.add_column("Memory %", style="bold blue", justify="right")
 for k, v in psutil_mem_usage.items():
     pct = f"{psutil_mem_usage_pct[k]:.0%}" if k in psutil_mem_usage_pct else ""
-    if v >= 1000/1024:
+    if v >= 1000 / 1024:
         table.add_row(k, f"{v:.1f}MiB", pct)
     else:
         table.add_row(k, f"{1024*v:.0f}KiB", pct)
 console.print(f"> memory baseline: [bold blue]{baseline:.1f}MiB[white]")
-console.print(f"> multiformats memory total:     [bold blue]{psutil_mem_usage_total:.1f}MiB[white]")
+console.print(
+    f"> multiformats memory total:     [bold blue]{psutil_mem_usage_total:.1f}MiB[white]"
+)
 console.print(table)
 
 
@@ -188,7 +206,16 @@ console.print(table)
 # TODO: consider introduce grouped multicodecs doing this directly, to reduce mem footprint (currently footprint is negligible)
 
 _multihash_indices: Dict[str, int] = {}
-_grouped_multicodecs: List[Tuple[str, str, Optional[List[int]], List[int], List[bool], typing_extensions.Literal["draft", "permanent"]]] = []
+_grouped_multicodecs: List[
+    Tuple[
+        str,
+        str,
+        Optional[List[int]],
+        List[int],
+        List[bool],
+        typing_extensions.Literal["draft", "permanent"],
+    ]
+] = []
 for codec in multicodec.table(tag="multihash"):
     is_implemented = multihash.is_implemented(codec.name)
     tokens = codec.name.split("-")
@@ -203,20 +230,40 @@ for codec in multicodec.table(tag="multihash"):
         pass
     if max_digest_size is None:
         try:
-            max_digest_size = int(tokens[-1])//8
+            max_digest_size = int(tokens[-1]) // 8
         except ValueError:
             pass
     if max_digest_size is None:
-        _grouped_multicodecs.append((codec.name, codec.tag, None, [codec.code], [is_implemented], codec.status))
+        _grouped_multicodecs.append(
+            (codec.name, codec.tag, None, [codec.code], [is_implemented], codec.status)
+        )
         continue
-    bitsize = max_digest_size*8
+    bitsize = max_digest_size * 8
     if label not in _multihash_indices:
         _multihash_indices[label] = len(_grouped_multicodecs)
-        _grouped_multicodecs.append((codec.name, codec.tag, [bitsize], [codec.code], [is_implemented], codec.status))
+        _grouped_multicodecs.append(
+            (
+                codec.name,
+                codec.tag,
+                [bitsize],
+                [codec.code],
+                [is_implemented],
+                codec.status,
+            )
+        )
     else:
         bitsize_list = _grouped_multicodecs[_multihash_indices[label]][2]
         if bitsize_list is None:
-            _grouped_multicodecs.append((codec.name, codec.tag, None, [codec.code], [is_implemented], codec.status))
+            _grouped_multicodecs.append(
+                (
+                    codec.name,
+                    codec.tag,
+                    None,
+                    [codec.code],
+                    [is_implemented],
+                    codec.status,
+                )
+            )
             continue
         code_list = _grouped_multicodecs[_multihash_indices[label]][3]
         impl_list = _grouped_multicodecs[_multihash_indices[label]][4]
@@ -227,20 +274,23 @@ for codec in multicodec.table(tag="multihash"):
 
 # == Multihash table ==
 
-def set_str(l: Collection[int], *, use_hex: bool = False, minlen: int = 4, maxlen: int = 8) -> str:
-    """ Compact representation of a sorted set of numbers. """
+
+def set_str(
+    l: Collection[int], *, use_hex: bool = False, minlen: int = 4, maxlen: int = 8
+) -> str:
+    """Compact representation of a sorted set of numbers."""
     assert minlen >= 3
     assert maxlen >= minlen
-    tostr: Callable[[int], str] = hex if use_hex else str # type: ignore
+    tostr: Callable[[int], str] = hex if use_hex else str  # type: ignore
     l = sorted(set(l))
     start = l[0]
     end = l[-1]
-    step = l[1]-l[0]
+    step = l[1] - l[0]
     if len(l) <= minlen:
         return f"{{{', '.join(tostr(i) for i in l)}}}"
-    if l == list(range(start, end+1, step)):
+    if l == list(range(start, end + 1, step)):
         fst = tostr(start)
-        snd = tostr(start+step)
+        snd = tostr(start + step)
         lst = tostr(end)
         return f"{{{fst}, {snd}, ..., {lst}}}"
     if len(l) <= maxlen:
@@ -273,15 +323,25 @@ for name, tag, bitsize_list, code_list, impl_list, status in _grouped_multicodec
         table.add_row(code2str(code_list[0]), name, "", impl_status, codec_status)
         continue
     if len(bitsize_list) <= 1:
-        table.add_row(code2str(code_list[0]), f"{name}", str(bitsize_list[0]), impl_status, codec_status)
+        table.add_row(
+            code2str(code_list[0]),
+            f"{name}",
+            str(bitsize_list[0]),
+            impl_status,
+            codec_status,
+        )
     else:
         label = "-".join(name.split("-")[:-1])
-        table.add_row(set_str(code_list, use_hex=hex_codes),
-                      f"{label}-[bright_black]Bitsize",
-                      set_str(bitsize_list),
-                      impl_status,
-                      codec_status)
-console.print(f"> Multihash functions implemented: [bold blue]{num_implemented}/{num_total}")
+        table.add_row(
+            set_str(code_list, use_hex=hex_codes),
+            f"{label}-[bright_black]Bitsize",
+            set_str(bitsize_list),
+            impl_status,
+            codec_status,
+        )
+console.print(
+    f"> Multihash functions implemented: [bold blue]{num_implemented}/{num_total}"
+)
 console.print(table)
 
 
@@ -302,7 +362,9 @@ for codec in multicodec.table(tag="multiaddr"):
     impl_status = "[green]yes" if is_implemented else "[red]no"
     codec_status = "[yellow]draft" if codec.status == "draft" else "[green]perm."
     table.add_row(code2str(codec.code), codec.name, impl_status, codec_status)
-console.print(f"> Multiaddr protocols implemented: [bold blue]{num_implemented}/{num_total}")
+console.print(
+    f"> Multiaddr protocols implemented: [bold blue]{num_implemented}/{num_total}"
+)
 console.print(table)
 
 # == Multibase table ==
