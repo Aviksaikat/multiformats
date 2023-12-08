@@ -1,5 +1,5 @@
 """
-    Implementation for the ``keccak`` hash functions, using the optional dependency `pysha3 <https://github.com/tiran/pysha3>`_.
+    Implementation for the ``keccak`` hash functions, using the optional dependency `safe-pysha3 <https://github.com/5afe/pysha3>`_.
 """
 
 import hashlib
@@ -15,7 +15,7 @@ def _keccak(digest_bits: int) -> Hashfun:
         import sha3  # type: ignore # pylint: disable = import-outside-toplevel
     except ImportError as e:
         raise ImportError(
-            "Module 'sha3' must be installed to use 'keccak' hash functions. Consider running 'pip install pysha3'."
+            "Module 'sha3' must be installed to use 'keccak' hash functions. Consider running 'pip install safe-pysha3'."
         ) from e
     h = getattr(sha3, f"keccak_{digest_bits}")
 
