@@ -17,12 +17,8 @@
 
 __version__ = "0.2.1"
 
-from . import varint
-from . import multicodec
-from . import multibase
-from . import multihash
+from . import multiaddr, multibase, multicodec, multihash, varint
 from .cid import CID
-from . import multiaddr
 
 __all__ = [
     "varint",

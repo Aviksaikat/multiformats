@@ -1,59 +1,13 @@
-[project]
-name = "multiformats-fix"
-version = "0.2.3"
-authors = [{ name = "SAIKAT KARMAKAR", email = "saikickkarma@protonmail.com" }]
-
-readme = "README.rst"
-license = { text = "MIT" }
-classifiers = [
-   "Development Status :: 2 - Pre-Alpha",
-   "Programming Language :: Python",
-   "Programming Language :: Python :: 3.9",
-   "Programming Language :: Python :: 3.10",
-   "Programming Language :: Python :: 3.11",
-   "Programming Language :: Python :: Implementation :: CPython",
-   "Programming Language :: Python :: Implementation :: PyPy",
-]
-dependencies = [
-   "typing-extensions",
-   "bases",
-   "multiformats-config",
-   "typing-validation-fix",
-]
-
-
-python_requires = ">=3.9"
-
-[project.urls]
-homepage = "https://github.com/aviksaikat/multiformats/"
-repository = "https://github.com/aviksaikat/multiformats/"
-Issues = "https://github.com/aviksaikat/multiformats/issues"
-Changelog = "https://github.com/aviksaikat/multiformats/releases"
-
-
-[project.optional-dependencies]
-dev = [
-   "mypy",
-   "pylint",
-   "pytest",
-   "pytest-cov",
-   "pysha3",
-   "blake3",
-   "pyskein",
-   "mmh3",
-   "pycryptodomex",
-]
-
-full = ["pysha3", "blake3", "pyskein", "mmh3", "pycryptodomex"]
-
-[tool.hatch.envs.default]
-python = "3.10"
-type = "virtual"
-
-[tool.hatch.build]
-sources = ["multiformats"]
-exclude = ["test/*"]
-
+# pyproject.toml
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = [
+    "setuptools>=45",
+    "wheel",
+    "setuptools_scm>=6.2"
+]
+build-backend = "setuptools.build_meta"
+
+# # see https://github.com/pypa/setuptools_scm
+# [tool.setuptools_scm]
+# version_scheme = "post-release"   # use post-release scheme (default is pre-release of next version)
+# local_scheme = "no-local-version" # interferes with PyPI

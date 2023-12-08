@@ -2,13 +2,9 @@
 
 import pytest
 
-from multiformats import varint, multibase, multicodec, multihash, CID
+from multiformats import CID, multibase, multicodec, multihash, varint
 
-test_data = [
-    b"",
-    b"Hello world!",
-    b"Hello world!"*1024
-]
+test_data = [b"", b"Hello world!", b"Hello world!" * 1024]
 
 bases = ["base58btc", "base32", "base64pad"]
 codecs = ["dag-pb", "raw"]
@@ -20,11 +16,10 @@ test_cases_v1 = [
     for codec in codecs
     for hashfun in hashfuns
 ]
-test_cases_v0 = [
-    ("base58btc", 0, "dag-pb", "sha2-256")
-]
+test_cases_v0 = [("base58btc", 0, "dag-pb", "sha2-256")]
 
-test_cases = test_cases_v1+test_cases_v0
+test_cases = test_cases_v1 + test_cases_v0
+
 
 @pytest.mark.parametrize("base, v, codec, hashfun", test_cases)
 @pytest.mark.parametrize("data", test_data)
@@ -50,12 +45,20 @@ def test_construct(data: bytes, base: str, v: int, codec: str, hashfun: str) -> 
         assert cid.digest == digest
         assert cid.raw_digest == raw_digest
 
+
 @pytest.mark.parametrize("base, v, codec, hashfun", test_cases_v1)
 @pytest.mark.parametrize("data", test_data)
 def test_set(data: bytes, base: str, v: int, codec: str, hashfun: str) -> None:
     digest = multihash.digest(data, hashfun)
     cid = CID(base, v, codec, digest)
-    for new_base in ["base58btc", "base32", "base32pad", "base64", "base64pad", "proquint"]:
+    for new_base in [
+        "base58btc",
+        "base32",
+        "base32pad",
+        "base64",
+        "base64pad",
+        "proquint",
+    ]:
         for new_codec in ["identity", "dag-pb", "dag-cbor", "raw"]:
             new_cid = cid.set(base=new_base, codec=new_codec)
             assert new_cid.base.name == new_base
@@ -64,9 +67,12 @@ def test_set(data: bytes, base: str, v: int, codec: str, hashfun: str) -> None:
             assert new_cid.hashfun.name == hashfun
             assert new_cid.digest == digest
 
+
 @pytest.mark.parametrize("base, v, codec, hashfun", test_cases)
 @pytest.mark.parametrize("data", test_data)
-def test_encode_decode(data: bytes, base: str, v: int, codec: str, hashfun: str) -> None:
+def test_encode_decode(
+    data: bytes, base: str, v: int, codec: str, hashfun: str
+) -> None:
     mc = multicodec.get(codec)
     digest = multihash.digest(data, hashfun)
     cid = CID(base, v, codec, digest)
@@ -74,28 +80,40 @@ def test_encode_decode(data: bytes, base: str, v: int, codec: str, hashfun: str)
     b = bytes(cid)
     assert s == str(cid)
     if v == 1:
-        assert b == varint.encode(v)+varint.encode(mc.code)+digest
+        assert b == varint.encode(v) + varint.encode(mc.code) + digest
     else:
         assert b == digest
     assert cid == CID.decode(s)
     assert cid.set(base="base58btc") == CID.decode(b)
     if v == 1:
-        for other_base in ["base58btc", "base32", "base32pad", "base64", "base64pad", "proquint"]:
+        for other_base in [
+            "base58btc",
+            "base32",
+            "base32pad",
+            "base64",
+            "base64pad",
+            "proquint",
+        ]:
             assert cid.set(base=other_base) == CID.decode(cid.encode(other_base))
 
+
 peer_id_test_cases = [
-    ("30820122300d06092a864886f70d01010105000382010f003082010a02820101"
-    "009a56a5c11e2705d0bfe0cd1fa66d5e519095cc741b62ed99ddf129c32e046e"
-    "5ba3958bb8a068b05a95a6a0623cc3c889b1581793cd84a34cc2307e0dd74c70"
-    "b4f230c74e5063ecd8e906d372be4eba13f47d04427a717ac78cb12b4b9c2ab5"
-    "591f36f98021a70f84d782c36c51819054228ff35a45efa3f82b27849ec89036"
-    "26b4a4c4b40f9f74b79caf55253687124c79cb10cd3bc73f0c44fbd341e5417d"
-    "2e85e900d22849d2bc85ca6bf037f1f5b4f9759b4b6942fccdf1140b30ea7557"
-    "87deb5c373c5953c14d64b523959a76a32a599903974a98cf38d4aaac7e359f8"
-    "6b00a91dcf424bf794592139e7097d7e65889259227c07155770276b6eda4cec"
-    "370203010001", "RSA"),
+    (
+        "30820122300d06092a864886f70d01010105000382010f003082010a02820101"
+        "009a56a5c11e2705d0bfe0cd1fa66d5e519095cc741b62ed99ddf129c32e046e"
+        "5ba3958bb8a068b05a95a6a0623cc3c889b1581793cd84a34cc2307e0dd74c70"
+        "b4f230c74e5063ecd8e906d372be4eba13f47d04427a717ac78cb12b4b9c2ab5"
+        "591f36f98021a70f84d782c36c51819054228ff35a45efa3f82b27849ec89036"
+        "26b4a4c4b40f9f74b79caf55253687124c79cb10cd3bc73f0c44fbd341e5417d"
+        "2e85e900d22849d2bc85ca6bf037f1f5b4f9759b4b6942fccdf1140b30ea7557"
+        "87deb5c373c5953c14d64b523959a76a32a599903974a98cf38d4aaac7e359f8"
+        "6b00a91dcf424bf794592139e7097d7e65889259227c07155770276b6eda4cec"
+        "370203010001",
+        "RSA",
+    ),
     ("1498b5467a63dffa2dc9d9e069caf075d16fc33fdd4c3b01bfadae6433767d93", "Ed25519"),
 ]
+
 
 @pytest.mark.parametrize("pk_bytes_hex, algorithm", peer_id_test_cases)
 def test_peer_id(pk_bytes_hex: str, algorithm: str) -> None:
