@@ -40,8 +40,7 @@ def _jit_register_blake2(m, register) -> bool:  # type: ignore
 
 def _blake3() -> Hashfun:
     try:
-        from blake3 import \
-            blake3  # type: ignore # pylint: disable = import-outside-toplevel
+        from blake3 import blake3  # pylint: disable = import-outside-toplevel
     except ImportError as e:
         raise ImportError(
             "Module 'blake3' must be installed to use 'blake3' hash function. Consider running 'pip install blake3'."

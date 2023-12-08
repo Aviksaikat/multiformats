@@ -1,11 +1,9 @@
-
 # Contributing
 
 All contributions, big and small, are very appreciated!
 [File an issue](#file-an-issue) for bug reports, suggestions and questions, or [make a pull request](#make-a-pull-request) to actively contribute to the code or documentation.
 
 However you decide to help, please refer to our [code of conduct](CODE_OF_CONDUCT.md) for what we expect from our community.
-
 
 ## File an Issue
 
@@ -28,7 +26,6 @@ Please try to be concise in your description, providing a minimal reproducible e
 
 If you're proposing a new feature, please describe it in detail, with a few examples of it might be implemented and of its intended usage.
 
-
 ## Make a Pull Request
 
 You can [make a pull request](https://docs.github.com/en/github/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) to:
@@ -42,7 +39,6 @@ You should [link your pull request to the issue(s)](https://docs.github.com/en/i
 - approve the pull request and merge it
 - start a discussion on how to improve the pull request before it can be approved
 - reject the pull request, with an explanation as to why we don't consider it viable for improvement
-
 
 ### Continuous Integration
 
@@ -73,7 +69,6 @@ pylint multiformats
 ```
 
 Whenever relevant, please consider contributing some additional tests pertaining to your implementation.
-
 
 ### Documentation
 

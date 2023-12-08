@@ -12,7 +12,7 @@ from .utils import Hashfun, validate_hashfun_args
 
 def _skein(version: int, digest_bits: int) -> Hashfun:
     try:
-        import skein  # type: ignore # pylint: disable = import-outside-toplevel
+        import skein  # pylint: disable = import-outside-toplevel
     except ImportError as e:
         raise ImportError(
             "Module 'skein' must be installed to use 'skein' hash functions. Consider running 'pip install pyskein'."

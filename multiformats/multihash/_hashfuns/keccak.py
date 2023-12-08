@@ -12,7 +12,7 @@ from .utils import Hashfun, validate_hashfun_args
 
 def _keccak(digest_bits: int) -> Hashfun:
     try:
-        import sha3  # type: ignore # pylint: disable = import-outside-toplevel
+        import sha3  # pylint: disable = import-outside-toplevel
     except ImportError as e:
         raise ImportError(
             "Module 'sha3' must be installed to use 'keccak' hash functions. Consider running 'pip install pysha3'."
