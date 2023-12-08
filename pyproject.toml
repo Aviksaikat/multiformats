@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 
-python_requires = ">=3.7"
+python_requires = ">=3.9"
 
 [project.urls]
 homepage = "https://github.com/aviksaikat/multiformats/"
@@ -37,17 +37,18 @@ dev = [
    "pylint",
    "pytest",
    "pytest-cov",
-   "safe-pysha3",
+   "pysha3",
    "blake3",
    "pyskein",
    "mmh3",
    "pycryptodomex",
 ]
 
-full = ["safe-pysha3", "blake3", "pyskein", "mmh3", "pycryptodomex"]
+full = ["pysha3", "blake3", "pyskein", "mmh3", "pycryptodomex"]
 
 [tool.hatch.envs.default]
 python = "3.10"
+type = "virtual"
 
 [tool.hatch.build]
 sources = ["multiformats"]

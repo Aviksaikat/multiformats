@@ -8,16 +8,15 @@ import inspect
 import json
 import os
 import pkgutil
-import sys
 from typing import Dict, List, Optional, Tuple
+import sys
 
 from typing_validation import validate
-
 
 def _list_package_contents(pkg_name: str) -> List[str]:
     modules = [pkg_name]
     for submod in pkgutil.iter_modules([pkg_name.replace(".", "/")]):
-        submod_fullname = pkg_name + "." + submod.name
+        submod_fullname = pkg_name+"."+submod.name
         if submod.ispkg:
             for subsubmod_name in _list_package_contents(submod_fullname):
                 modules.append(subsubmod_name)
@@ -25,10 +24,9 @@ def _list_package_contents(pkg_name: str) -> List[str]:
             modules.append(submod_fullname)
     return modules
 
-
 def make_apidocs() -> None:
     """
-    A script to generate .rst files for API documentation.
+        A script to generate .rst files for API documentation.
     """
     err_msg = """Expected a 'make-api.json' file, with the following structure:
 {
@@ -72,9 +70,12 @@ Set "toc_filename" to null to avoid generating a table of contents file.
 
     cwd = os.getcwd()
     os.chdir(pkg_path)
-    sys.path = [os.getcwd()] + sys.path
+    sys.path = [os.getcwd()]+sys.path
     modules = _list_package_contents(pkg_name)
-    modules_dict = {mod_name: importlib.import_module(mod_name) for mod_name in modules}
+    modules_dict = {
+        mod_name: importlib.import_module(mod_name)
+        for mod_name in modules
+    }
     for mod_name in include_modules:
         if mod_name not in modules_dict:
             modules_dict[mod_name] = importlib.import_module(mod_name)
@@ -90,30 +91,26 @@ Set "toc_filename" to null to avoid generating a table of contents file.
 
     for mod_name, mod in modules_dict.items():
         if any(mod_name.startswith(name) for name in exclude_modules):
-            # if mod_name in exclude_modules:
+        # if mod_name in exclude_modules:
             mod_name_to_del.append(mod_name)
             continue
         filename = f"{apidocs_folder}/{mod_name}.rst"
         print(f"Writing API docfile {filename}")
         lines: List[str] = [
             mod_name,
-            "=" * len(mod_name),
+            "="*len(mod_name),
             "",
             f".. automodule:: {mod_name}",
-            "",
+            ""
         ]
         mod__all__ = getattr(mod, "__all__", [])
         reexported_members: List[Tuple[str, str]] = []
-        for member_name in sorted(
-            name for name in dir(mod) if not name.startswith("_")
-        ):
+        for member_name in sorted(name for name in dir(mod) if not name.startswith("_")):
             if mod_name in exclude_members and member_name in exclude_members[mod_name]:
                 continue
             member = getattr(mod, member_name)
             member_module = inspect.getmodule(member)
-            member_module_name = (
-                member_module.__name__ if member_module is not None else None
-            )
+            member_module_name = member_module.__name__ if member_module is not None else None
             imported_member = member_module is not None and member_module != mod
             if mod_name in include_members and member_name in include_members[mod_name]:
                 imported_member = False
@@ -135,7 +132,7 @@ Set "toc_filename" to null to avoid generating a table of contents file.
                 member_lines: List[str] = []
                 member_lines = [
                     member_name,
-                    "-" * len(member_name),
+                    "-"*len(member_name),
                     "",
                     f".. auto{member_kind}:: {member_fullname}",
                 ]
@@ -149,20 +146,18 @@ Set "toc_filename" to null to avoid generating a table of contents file.
         if reexported_members:
             reexported_members_header = f"{mod_name}.__all__"
             print(f"    {reexported_members_header}:")
-            lines.extend(
-                [
-                    reexported_members_header,
-                    "-" * len(reexported_members_header),
-                    "",
-                    "The following members were explicitly reexported using ``__all__``:",
-                    "",
-                ]
-            )
+            lines.extend([
+                reexported_members_header,
+                "-"*len(reexported_members_header),
+                "",
+                "The following members were explicitly reexported using ``__all__``:",
+                "",
+            ])
             refkinds = {
                 "data": "obj",
                 "function": "func",
                 "class": "class",
-                "module": "mod",
+                "module": "mod"
             }
             for member_fullname, member_kind in reexported_members:
                 refkind = f":py:{refkinds[member_kind]}:"
@@ -173,6 +168,7 @@ Set "toc_filename" to null to avoid generating a table of contents file.
             f.write("\n".join(lines))
         print("")
 
+
     for mod_name in mod_name_to_del:
         del modules_dict[mod_name]
 
@@ -180,7 +176,7 @@ Set "toc_filename" to null to avoid generating a table of contents file.
         ".. toctree::",
         "    :maxdepth: 2",
         "    :caption: API Documentation",
-        "",
+        ""
     ]
     print(f"Writing TOC for API docfiles at {toc_filename}")
     for mod_name in modules_dict:
@@ -192,7 +188,6 @@ Set "toc_filename" to null to avoid generating a table of contents file.
 
     with open(toc_filename, "w") as f:
         f.write("\n".join(toctable_lines))
-
 
 if __name__ == "__main__":
     make_apidocs()

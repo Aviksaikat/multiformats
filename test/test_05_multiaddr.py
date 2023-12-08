@@ -1,26 +1,25 @@
 # pylint: disable = missing-docstring
 
-import sys
 from random import Random
+import sys
 from typing import List, Union
 
 import pytest
 
-from multiformats import multiaddr, multicodec
-from multiformats.multiaddr import Addr, Multiaddr, Proto
-from multiformats.multiaddr.err import MultiaddrKeyError, MultiaddrValueError
+from multiformats import multicodec, multiaddr
 from multiformats.multicodec import Multicodec
 from multiformats.multicodec.err import MulticodecKeyError
+from multiformats.multiaddr import Proto, Addr, Multiaddr
+from multiformats.multiaddr.err import MultiaddrKeyError, MultiaddrValueError
+
 
 implemented_protocols: List[Proto] = []
-
 
 @pytest.mark.parametrize("multicodec", multicodec.table(tag="multiaddr"))
 def test_implemented_protos(multicodec: Multicodec) -> None:
     name = multicodec.name
     if multiaddr.raw.exists(name):
         implemented_protocols.append(Proto(name))
-
 
 invalid_multiaddr_strings = [
     "/ip4",
@@ -62,22 +61,20 @@ invalid_multiaddr_strings = [
     "/ip4/127.0.0.1/tcp/9090/http/p2p-webcrt-direct",
     "/dns",
     "/dns4",
-    "/dns6",
+    "/dns6"
 ]
-
 
 @pytest.mark.parametrize("multiaddr_str", invalid_multiaddr_strings)
 def test_invalid_parse(multiaddr_str: str) -> None:
     try:
         multiaddr.parse(multiaddr_str)
         assert False
-    except MultiaddrValueError:  # invalid string
+    except MultiaddrValueError: # invalid string
         pass
-    except MultiaddrKeyError:  # protocol not implemented
+    except MultiaddrKeyError: # protocol not implemented
         pass
-    except MulticodecKeyError:  # protocol does not exist
+    except MulticodecKeyError: # protocol does not exist
         pass
-
 
 valid_multiaddr_strings = [
     "/ip4/1.2.3.4",
@@ -117,17 +114,15 @@ valid_multiaddr_strings = [
     "/tcp/1234/unix/stdio",
     "/ip4/127.0.0.1/tcp/9090/http/p2p-webrtc-direct",
     "/dns/example.com",
-    "/dns4/موقع.وزارة-الاتصالات.مصر",
+    "/dns4/موقع.وزارة-الاتصالات.مصر"
 ]
-
 
 @pytest.mark.parametrize("multiaddr_str", valid_multiaddr_strings)
 def test_valid_parse(multiaddr_str: str) -> None:
     try:
         multiaddr.parse(multiaddr_str)
-    except multiaddr.err.MultiaddrKeyError:  # protocol not implemented
+    except multiaddr.err.MultiaddrKeyError: # protocol not implemented
         pass
-
 
 @pytest.mark.parametrize("multiaddr_str", valid_multiaddr_strings)
 def test_parse_str(multiaddr_str: str) -> None:
@@ -135,9 +130,8 @@ def test_parse_str(multiaddr_str: str) -> None:
         ma = multiaddr.parse(multiaddr_str)
         str(ma)
         assert str(ma) == multiaddr_str
-    except multiaddr.err.MultiaddrKeyError:  # protocol not implemented
+    except multiaddr.err.MultiaddrKeyError: # protocol not implemented
         pass
-
 
 @pytest.mark.parametrize("multiaddr_str", valid_multiaddr_strings)
 def test_bytes_decode(multiaddr_str: str) -> None:
@@ -145,13 +139,11 @@ def test_bytes_decode(multiaddr_str: str) -> None:
         ma = multiaddr.parse(multiaddr_str)
         bytes(ma)
         assert ma == multiaddr.decode(bytes(ma))
-    except multiaddr.err.MultiaddrKeyError:  # protocol not implemented
+    except multiaddr.err.MultiaddrKeyError: # protocol not implemented
         pass
-
 
 rand = Random(0)
 num_attempts = 10
-
 
 def random_addr(proto: Proto) -> Union[Proto, Addr]:
     addr_size = proto.addr_size
@@ -163,18 +155,13 @@ def random_addr(proto: Proto) -> Union[Proto, Addr]:
         if sys.version_info[1] >= 9:
             addr_bytes = rand.randbytes(addr_size)
         else:
-            addr_bytes = rand.getrandbits(addr_size * 8).to_bytes(
-                addr_size, byteorder="big"
-            )
+            addr_bytes = rand.getrandbits(addr_size*8).to_bytes(addr_size, byteorder="big")
         if not proto.is_addr_valid(addr_bytes):
             with pytest.raises(multiaddr.err.MultiaddrValueError):
-                proto / addr_bytes  # pylint: disable = pointless-statement
+                proto/addr_bytes # pylint: disable = pointless-statement
             continue
-        return proto / addr_bytes
-    raise RuntimeError(
-        f"Could not generate a valid random address for protocol {repr(proto.name)}"
-    )
-
+        return proto/addr_bytes
+    raise RuntimeError(f"Could not generate a valid random address for protocol {repr(proto.name)}")
 
 def random_multiaddr(use_slash: bool = False, maxlen: int = 4) -> Multiaddr:
     assert maxlen >= 1
@@ -187,9 +174,8 @@ def random_multiaddr(use_slash: bool = False, maxlen: int = 4) -> Multiaddr:
         return Multiaddr(*addrs)
     a = Multiaddr(addrs[0])
     for idx in range(1, l):
-        a = a / addrs[idx]
+        a = a/addrs[idx]
     return a
-
 
 @pytest.mark.parametrize("sample", range(40))
 @pytest.mark.parametrize("use_slash", [False, True])
