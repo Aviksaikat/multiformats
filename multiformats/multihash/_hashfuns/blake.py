@@ -15,7 +15,7 @@ def _hashlib_blake2(version: str, digest_bits: int) -> Hashfun:
 
     def hashfun(data: BytesLike, size: Optional[int] = None) -> bytes:
         validate_hashfun_args(data, size, digest_bits // 8)
-        m: hashlib._Hash = h(
+        m: hashlib._Hash = h(  # type: ignore
             digest_size=digest_bits // 8
         )  # pylint: disable = no-member
         m.update(data)

@@ -1,6 +1,6 @@
 [project]
 name = "multiformats-fix"
-version = "0.2.2"
+version = "0.2.3"
 authors = [{ name = "aviksaikat", email = "saikickkarma@protonmail.com" }]
 description = "Python implementation of multiformats protocols."
 readme = "README.rst"
